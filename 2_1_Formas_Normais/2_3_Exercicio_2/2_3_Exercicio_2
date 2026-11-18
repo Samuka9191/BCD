@@ -1,1 +1,123 @@
+# NORMALIZAÇÃO DE BANCO DE DADOS – CONTROLE DE ESTOQUE
+
+## 1. Análise da tabela original
+
+A tabela original apresenta as seguintes informações:
+
+- ID do estoque
+- Data de entrada
+- Produto
+- Tamanho
+- Cor
+- Preço unitário
+- Quantidade (QTD)
+- Fornecedor
+- Endereço
+- Telefone
+
+Foi identificado que alguns campos possuem mais de um valor na mesma célula, como produto, preço unitário, quantidade e telefone. Isso causa problemas de organização e dificulta consultas e atualizações no banco de dados.
+
+## 2. Primeira Forma Normal (1FN)
+
+Para atender à Primeira Forma Normal, todos os campos devem possuir valores atômicos, ou seja, apenas um valor por campo.
+
+Assim, os produtos, preços e quantidades que estavam juntos foram separados em registros individuais. Os telefones também foram separados.
+
+**Tabela em 1FN:**
+
+| ID Estoque | Data entrada | Produto | Tamanho | Cor | Preço | QTD | Fornecedor |
+|---|---|---|---|---|---:|---:|---|
+| 1 | 21/06/2026 | Molde Polietano Liso | G | Ciano | 20,45 | 2 | AZ Industria e Comercio LTDA |
+| 1 | 21/06/2026 | Molde Polipropileno Fosco | G | Ciano | 20,45 | 7 | AZ Industria e Comercio LTDA |
+| 2 | 25/06/2026 | Molde Polipropileno Fosco | GG | Cinza | 30,00 | 9 | Marks Industria e Comercio IND |
+| 3 | 29/06/2026 | Molde Polietano Fosco | XG | Preto | 50,00 | 18 | Zenon Industria e Varejo ME |
+
+*Observação: os dois produtos da primeira linha foram separados, mantendo a correspondência entre os preços e quantidades informados na imagem.*
+
+## 3. Segunda Forma Normal (2FN)
+
+Para atender à Segunda Forma Normal, a tabela deve estar na 1FN e todos os atributos não-chave devem depender da chave primária completa.
+
+Foram identificadas informações que dependem somente do estoque e outras que dependem do produto.
+
+Por isso, a estrutura foi dividida em três tabelas:
+
+**Tabela Estoque**
+
+| ID Estoque (PK) | Data Entrada |
+|---|---|
+| 1 | 21/06/2026 |
+| 2 | 25/06/2026 |
+| 3 | 29/06/2026 |
+
+**Tabela Produtos**
+
+| ID Produto (PK) | Produto | Tamanho | Cor |
+|---|---|---|---|
+| 1 | Molde Polietano Liso | G | Ciano |
+| 2 | Molde Polipropileno Fosco | G | Ciano |
+| 3 | Molde Polipropileno Fosco | GG | Cinza |
+| 4 | Molde Polietano Fosco | XG | Preto |
+
+**Tabela Itens_Estoque**
+
+| ID Estoque (PK/FK) | ID Produto (PK/FK) | Preço Unitário | Quantidade |
+|---|---|---:|---:|
+| 1 | 1 | 20,45 | 2 |
+| 1 | 2 | 20,45 | 7 |
+| 2 | 3 | 30,00 | 9 |
+| 3 | 4 | 50,00 | 18 |
+
+## 4. Terceira Forma Normal (3FN)
+
+Para atender à Terceira Forma Normal, a tabela deve estar na 2FN e não possuir dependências transitivas.
+
+Foi identificado que os dados do fornecedor, como nome, endereço e telefone, devem ficar separados das informações do estoque.
+
+Também foi criada uma tabela específica para os telefones, pois um fornecedor pode possuir mais de um número de contato.
+
+A estrutura final ficou dividida em cinco tabelas:
+
+**Tabela Fornecedores**
+
+| ID Fornecedor (PK) | Nome | Endereço |
+|---|---|---|
+| 1 | AZ Industria e Comercio LTDA | Rua das Flores, 140 - Parque Industrial - Jaguariuna/SP |
+| 2 | Marks Industria e Comercio IND | Rod. Geraldo Azevedo, 1350 - Centro Industrial - Brasiléia/AC |
+| 3 | Zenon Industria e Varejo ME | Rua Amazonas, 200 - Jardim das Flores - Monte Sião/MG |
+
+**Tabela Telefones_Fornecedor**
+
+| ID Fornecedor (PK/FK) | Telefone (PK) |
+|---|---|
+| 1 | 8999-0001 |
+| 1 | 8978-0007 |
+| 2 | 9087-9820 |
+| 3 | 1098-0920 |
+
+**Tabela Estoque**
+
+| ID Estoque (PK) | Data Entrada | ID Fornecedor (FK) |
+|---|---|---|
+| 1 | 21/06/2026 | 1 |
+| 2 | 25/06/2026 | 2 |
+| 3 | 29/06/2026 | 3 |
+
+As tabelas Produtos e Itens_Estoque permanecem conforme a estrutura apresentada na 2FN.
+
+## 5. Resultado final da normalização
+
+Após a normalização, o banco de dados ficou organizado em cinco tabelas:
+
+1. **Fornecedores:** armazena os dados dos fornecedores.
+2. **Telefones_Fornecedor:** armazena os telefones dos fornecedores.
+3. **Estoque:** registra as entradas de estoque e seus fornecedores.
+4. **Produtos:** armazena os produtos, tamanhos e cores.
+5. **Itens_Estoque:** registra os produtos recebidos, seus preços e quantidades.
+
+## 6. Conclusão
+
+A normalização da tabela Controle de Estoque foi realizada até a Terceira Forma Normal (3FN), com o objetivo de organizar as informações, evitar redundâncias e melhorar a integridade dos dados.
+
+A separação das tabelas permite controlar melhor os produtos, fornecedores, telefones e entradas de estoque, facilitando as consultas, atualizações e futuras operações no banco de dados.
 
